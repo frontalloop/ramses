@@ -1,0 +1,537 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Ramses Services — design tokens
+   Palette refined from the official logo (dark maroon field, ember-gold
+   glow, cream oval, warm white lettering).
+------------------------------------------------------------------ */
+@theme {
+  --color-burgundy: #2a060b;
+  --color-burgundy-deep: #1c0407;
+  --color-maroon: #430b14;
+  --color-maroon-soft: #5a1420;
+  --color-gold: #d4a62a;
+  --color-gold-soft: #e3c15e;
+  --color-ember: #fba216; /* sampled from the logo arrows */
+  --color-cream: #f5efe3;
+  --color-cream-deep: #e8dfcc;
+  --color-charcoal: #111111;
+
+  --font-ar: var(--font-cairo), system-ui, sans-serif;
+  --font-en: var(--font-manrope), system-ui, sans-serif;
+
+  --radius-card: 32px;
+  --radius-xcard: 40px;
+
+  --ease-brand: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root {
+  --header-h: 76px;
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--header-h) + 24px);
+  }
+
+  html[data-lang="ar"] body {
+    font-family: var(--font-ar);
+  }
+  html[data-lang="en"] body {
+    font-family: var(--font-en);
+  }
+
+  body {
+    background: var(--color-burgundy-deep);
+    color: var(--color-cream);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body[data-locked="true"] {
+    overflow: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  ::selection {
+    background: var(--color-gold);
+    color: var(--color-burgundy);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 999px;
+  }
+}
+
+@layer utilities {
+  /* Gold text / rules ------------------------------------------------ */
+  .text-gold-grad {
+    background: linear-gradient(100deg, var(--color-gold) 0%, var(--color-gold-soft) 42%, var(--color-ember) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .rule-gold {
+    background: linear-gradient(
+      to var(--rule-dir, right),
+      transparent,
+      color-mix(in srgb, var(--color-gold) 70%, transparent),
+      transparent
+    );
+  }
+
+  /* Surfaces --------------------------------------------------------- */
+  .surface-maroon {
+    background:
+      radial-gradient(120% 140% at 15% 0%, color-mix(in srgb, var(--color-maroon) 88%, transparent) 0%, transparent 60%),
+      linear-gradient(180deg, var(--color-burgundy) 0%, var(--color-burgundy-deep) 100%);
+  }
+
+  .card-shell {
+    border-radius: var(--radius-card);
+    border: 1px solid color-mix(in srgb, var(--color-gold) 18%, transparent);
+    background: linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--color-maroon) 62%, transparent) 0%,
+      color-mix(in srgb, var(--color-burgundy) 82%, transparent) 100%
+    );
+    box-shadow: 0 22px 60px -34px rgba(0, 0, 0, 0.9);
+    transition:
+      border-color 0.45s var(--ease-brand),
+      transform 0.45s var(--ease-brand),
+      box-shadow 0.45s var(--ease-brand);
+  }
+
+  .card-shell:hover {
+    border-color: color-mix(in srgb, var(--color-gold) 55%, transparent);
+  }
+
+  .card-cream {
+    border-radius: var(--radius-card);
+    background: linear-gradient(170deg, #fffdf8 0%, var(--color-cream) 60%, var(--color-cream-deep) 100%);
+    color: var(--color-burgundy);
+  }
+
+  /* Section curvature ------------------------------------------------ */
+  .curve-top {
+    border-start-start-radius: clamp(40px, 7vw, 88px);
+    border-start-end-radius: clamp(40px, 7vw, 88px);
+  }
+  .curve-bottom {
+    border-end-start-radius: clamp(40px, 7vw, 88px);
+    border-end-end-radius: clamp(40px, 7vw, 88px);
+  }
+
+  /* Reveal primitives (GSAP toggles .is-in) --------------------------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.9s var(--ease-brand),
+      transform 0.9s var(--ease-brand);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .reveal.is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  .split-line {
+    display: block;
+    overflow: hidden;
+  }
+  .split-line > span {
+    display: block;
+    transform: translateY(105%);
+    transition: transform 1s var(--ease-brand);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  .is-in .split-line > span,
+  .split-line.is-in > span {
+    transform: none;
+  }
+
+  /* Direction-aware arrow nudge (translate-x is not auto-flipped in RTL) --- */
+  .arrow-slide {
+    --dx: 5px;
+    transition: transform 0.4s var(--ease-brand);
+  }
+  [dir="rtl"] .arrow-slide {
+    --dx: -5px;
+    transform: rotate(180deg);
+  }
+  .group:hover .arrow-slide,
+  .group:focus-visible .arrow-slide {
+    transform: translateX(var(--dx));
+  }
+  [dir="rtl"] .group:hover .arrow-slide,
+  [dir="rtl"] .group:focus-visible .arrow-slide {
+    transform: translateX(var(--dx)) rotate(180deg);
+  }
+
+  /* Pill button base — no square corners anywhere on the page --------- */
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    border-radius: 999px;
+    padding: 0.95rem 1.9rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    isolation: isolate;
+    overflow: hidden;
+    transition:
+      transform 0.35s var(--ease-brand),
+      box-shadow 0.35s var(--ease-brand),
+      color 0.35s var(--ease-brand),
+      border-color 0.35s var(--ease-brand);
+  }
+  .btn:active {
+    transform: scale(0.975);
+  }
+
+  .btn-primary {
+    color: var(--color-burgundy);
+    background: linear-gradient(105deg, var(--color-gold) 0%, var(--color-gold-soft) 55%, var(--color-ember) 100%);
+    box-shadow: 0 14px 34px -18px color-mix(in srgb, var(--color-gold) 75%, transparent);
+  }
+  .btn-primary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(105deg, var(--color-ember) 0%, var(--color-gold) 100%);
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-brand);
+  }
+  .btn-primary:hover {
+    box-shadow: 0 18px 44px -16px color-mix(in srgb, var(--color-gold) 85%, transparent);
+  }
+  .btn-primary:hover::after {
+    opacity: 1;
+  }
+
+  .btn-secondary {
+    color: var(--color-cream);
+    border: 1px solid color-mix(in srgb, var(--color-gold) 60%, transparent);
+  }
+  .btn-secondary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(105deg, var(--color-gold) 0%, var(--color-gold-soft) 100%);
+    transform: scaleX(0);
+    transform-origin: var(--sweep-origin, left);
+    transition: transform 0.5s var(--ease-brand);
+  }
+  [dir="rtl"] .btn-secondary::after {
+    --sweep-origin: right;
+  }
+  .btn-secondary:hover {
+    color: var(--color-burgundy);
+    border-color: transparent;
+  }
+  .btn-secondary:hover::after {
+    transform: scaleX(1);
+  }
+
+  .btn-dark {
+    color: var(--color-cream);
+    background: linear-gradient(160deg, var(--color-maroon) 0%, var(--color-burgundy) 100%);
+    border: 1px solid color-mix(in srgb, var(--color-gold) 35%, transparent);
+  }
+  .btn-dark:hover {
+    border-color: color-mix(in srgb, var(--color-gold) 80%, transparent);
+    box-shadow: 0 16px 40px -22px rgba(0, 0, 0, 0.9);
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  /* The track holds two identical copies, so a half-width shift loops
+     seamlessly. RTL lays the copies out right-to-left, so it shifts the
+     other way. */
+  .marquee-track {
+    animation: marquee 38s linear infinite;
+  }
+  [dir="rtl"] .marquee-track {
+    animation-name: marquee-rtl;
+  }
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes marquee-rtl {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(50%, 0, 0);
+  }
+}
+
+@keyframes dash-travel {
+  to {
+    stroke-dashoffset: -130;
+  }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==================================================================
+   Loader — scoped styles. Nothing here is used anywhere else on the
+   page. The dusty logo is pure CSS/SVG so it paints before hydration;
+   JS only owns --p (0→100) and the exact 3.000s exit.
+================================================================== */
+
+/* --p is the master timeline: 0 → 100 over the cleaning phase. Registering it
+   as a number makes it animatable, so the style engine interpolates it and
+   every part that reads it — the worker's position, the dust mask edge, the
+   progress fill — moves continuously off one clock. Nothing is written
+   per-frame from JS, so a busy main thread can no longer stall the motion and
+   then snap it forward. */
+@property --p {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+@keyframes ldr-progress {
+  from {
+    --p: 0;
+  }
+  to {
+    --p: 100;
+  }
+}
+
+.ldr-root {
+  /* Flat deep burgundy. No gradient, no spotlight, nothing lit behind the
+     mark — the only light in this loader is the artwork's own. */
+  background: #24050a;
+  /* Held until the loader has latched the travel direction, then seeded to the
+     page clock and released. Starting it at first paint would run the sweep in
+     the server's default direction and reverse it when a saved locale applied. */
+  animation: ldr-progress 2700ms linear both paused;
+  transition:
+    opacity 150ms ease-out,
+    transform 150ms ease-out;
+}
+.ldr-root[data-exit="true"] {
+  opacity: 0;
+  transform: translate3d(0, -2.5%, 0);
+}
+
+/* The official artwork is shown raw. Nothing is layered on it, nothing is
+   animated on it: the clean logo is only ever revealed by the dust above it
+   being masked away. Stated explicitly so no effect can creep back in. */
+.ldr-mark > img {
+  filter: none;
+  box-shadow: none;
+  text-shadow: none;
+  mix-blend-mode: normal;
+  opacity: 1;
+  transform: none;
+}
+
+/* The tool travels with the reading direction: LTR left→right, RTL right→left.
+   Keyed off data-travel, which the loader latches once on mount — reading
+   `dir` live would flip the worker mid-run when a saved locale is applied. */
+.ldr-mark {
+  --wipe: right;
+}
+.ldr-root[data-travel="rtl"] .ldr-mark {
+  --wipe: left;
+}
+
+/* Dust sits above the untouched logo and is masked away as --p grows.
+   Outer element keeps the dust on the oval mark so the artwork's own
+   rectangle never shows an edge; inner element is the wipe itself. */
+.ldr-dirty-clip {
+  position: absolute;
+  /* Exactly the image box — .ldr-mark is taller than the artwork (it holds
+     the worker's footroom), and stretching the mask over that padding would
+     slide the dust off the mark. */
+  inset: 0 0 auto 0;
+  aspect-ratio: 1536 / 1024;
+  /* The artwork's own alpha channel is the mask, so dust settles on the
+     mark itself and never floats on the burgundy behind it. Same file the
+     <img> already loaded — no second request. */
+  -webkit-mask-image: url("/ramses-logo.png");
+  mask-image: url("/ramses-logo.png");
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.ldr-dirty {
+  --edge: calc(var(--p) * 1%);
+  position: absolute;
+  inset: 0;
+  -webkit-mask-image: linear-gradient(
+    to var(--wipe),
+    transparent 0,
+    transparent calc(var(--edge) - 12px),
+    #000 calc(var(--edge) + 12px),
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to var(--wipe),
+    transparent 0,
+    transparent calc(var(--edge) - 12px),
+    #000 calc(var(--edge) + 12px),
+    #000 100%
+  );
+}
+/* Same artwork, dulled — wiping it away is what returns the colour. Only a
+   light knock-back: the mark's burgundy has to stay burgundy under the dust,
+   or the dusty half reads as damage rather than dirt. The grain above it
+   does most of the work. */
+.ldr-dirty img {
+  filter: grayscale(0.34) sepia(0.22) brightness(0.86) contrast(0.88);
+}
+.ldr-grit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* The worker rides the wipe edge: its blade sits at 75% of its own box.
+   One element, mounted once and never re-keyed. Its only animated property is
+   the offset below, driven by --p — no opacity, no visibility, no second
+   animation system, so it cannot blink out or teleport. The fixed base state
+   is stated explicitly so nothing can hide it. */
+.ldr-worker {
+  position: absolute;
+  top: 19.6%;
+  width: 40%; /* sized off the logo's width, so the box's padding can't scale it */
+  /* Physical offsets, not inset-inline-start: a logical property re-anchors
+     from one edge to the other the moment html[dir] changes, which threw the
+     worker across the mark when a saved locale was applied. */
+  left: calc(var(--p) * 1%);
+  right: auto;
+  transform: translateX(-75%);
+  pointer-events: none;
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  z-index: 2; /* above the dust it is wiping away */
+}
+.ldr-worker svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.ldr-root[data-travel="rtl"] .ldr-worker {
+  left: auto;
+  right: calc(var(--p) * 1%);
+  transform: translateX(75%);
+}
+.ldr-root[data-travel="rtl"] .ldr-worker svg {
+  transform: scaleX(-1);
+}
+
+/* Progress: thin, fully rounded, matte gold on a muted maroon track. */
+.ldr-count {
+  color: #c99a24;
+}
+.ldr-track {
+  height: 3px;
+  border-radius: 999px;
+  background: #3d1018;
+  overflow: hidden;
+}
+.ldr-fill {
+  height: 100%;
+  width: calc(var(--p) * 1%);
+  border-radius: 999px;
+  background: #c99a24; /* flat matte gold — no gradient, no shine */
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Same 3s and the same dusty→clean reveal, simplified: no travel on the way
+     out, just a plain fade. The worker stays welded to the wipe edge, because
+     detaching it would show a clean strip the tool never touched.
+     The blanket animation-duration override below must not touch the master
+     timeline, or --p would jump straight to 100. */
+  .ldr-root {
+    animation-duration: 2700ms !important;
+  }
+  .ldr-root[data-exit="true"] {
+    transform: none;
+  }
+  /* No pinned scroll-scrub hero when motion is reduced: one static frame. */
+  .hero-scroll {
+    height: 100svh !important;
+  }
+  .marquee-track {
+    animation: none;
+  }
+  .reveal,
+  .split-line > span {
+    transition-duration: 0.001ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
