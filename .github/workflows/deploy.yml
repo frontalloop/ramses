@@ -1,37 +1,63 @@
-name: Deploy to GitHub Pages
+name: Publish static export to hostinger branch
+
+# Hostinger deploys the `hostinger` branch straight into public_html, so that
+# branch must hold the contents of out/ and nothing else -- no source, no
+# package manifests, no workflows. It is a generated branch: every run replaces
+# it with a fresh single-commit orphan history. `main` is never touched.
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+# Only what is needed to push the generated branch back to this repository.
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 concurrency:
-  group: pages
+  group: hostinger-deploy
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  publish:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+
       - run: npm ci
+
       - run: npm run build
-      - run: touch out/.nojekyll
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: out
-      - id: deployment
-        uses: actions/deploy-pages@v4
+
+      # Never publish a broken build: out/ is only trustworthy if the export
+      # actually ran, and a config that fails to load still exits 0 while
+      # emitting .next alone.
+      - name: Verify the static export
+        run: |
+          test -f out/index.html || { echo "::error::out/index.html missing - static export did not run"; exit 1; }
+          test -d out/_next     || { echo "::error::out/_next missing - static export did not run"; exit 1; }
+          test -f out/.htaccess || { echo "::error::out/.htaccess missing - cache policy would be lost"; exit 1; }
+          echo "out/ contains $(find out -type f | wc -l) files"
+
+      # Publish from inside out/ so the new repository root *is* the build
+      # output. The parent .gitignore does not apply here, so dotfiles such as
+      # .htaccess are included.
+      - name: Publish out/ to the hostinger branch
+        working-directory: out
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git init -b hostinger
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "deploy: static export from ${GITHUB_SHA}"
+          # Force-push the generated branch only. The refspec is pinned to
+          # hostinger:hostinger so this can never reach main.
+          git push --force \
+            "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" \
+            hostinger:hostinger
