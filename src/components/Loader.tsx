@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useLang } from "@/lib/lang";
 import { firstFrameUrl } from "./Hero";
 
@@ -53,6 +54,7 @@ export default function Loader() {
 
   useEffect(() => {
     document.body.dataset.locked = "true";
+    window.scrollTo(0, 0); // reinforce the head script, in case a restore slipped through
     const root = rootRef.current;
 
     // Latch the travel direction from the same store the language provider
@@ -109,7 +111,12 @@ export default function Loader() {
     const toDone = setTimeout(
       () => {
         setDone(true);
+        // Top first, then unlock, then let ScrollTrigger re-measure: while the
+        // body was locked the document could not scroll, so every trigger was
+        // measured against a zero-height scroller.
+        window.scrollTo(0, 0);
         delete document.body.dataset.locked;
+        ScrollTrigger.refresh();
         window.dispatchEvent(new Event("ramses:loaded"));
       },
       Math.max(0, TOTAL - performance.now()),

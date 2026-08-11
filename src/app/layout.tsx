@@ -41,6 +41,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     // Arabic + RTL is the default; LangProvider swaps these on the client.
     <html lang="ar" dir="rtl" data-lang="ar" className={`${cairo.variable} ${manrope.variable}`}>
+      <head>
+        {/* Every reload is a fresh visit: kill the browser's scroll restoration
+            and sit at the top before anything paints, so the loader never opens
+            over a scrolled page and the hero always starts at frame 1. Runs
+            before hydration; the late re-assert catches engines that restore
+            after the load event. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{history.scrollRestoration="manual"}catch(e){}' +
+              "window.scrollTo(0,0);" +
+              'addEventListener("load",function(){window.scrollTo(0,0)},{once:true});',
+          }}
+        />
+      </head>
       <body data-locked="true">
         {/* Without JS the loader never clears the scroll lock — release it. */}
         <noscript>
