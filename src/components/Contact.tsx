@@ -12,7 +12,6 @@ export default function Contact() {
     { icon: "phone", label: t.contact.phoneLabel, value: CONTACT.phone, href: CONTACT.phoneHref },
     { icon: "whatsapp", label: t.contact.mobileLabel, value: CONTACT.mobile, href: CONTACT.whatsapp, external: true },
     { icon: "mail", label: t.contact.emailLabel, value: CONTACT.email, href: CONTACT.emailHref },
-    { icon: "globe", label: t.contact.websiteLabel, value: CONTACT.website, href: CONTACT.websiteHref, external: true },
   ];
 
   return (
@@ -24,7 +23,7 @@ export default function Contact() {
         <div className="grid gap-6">
           {/* ---------------- details ---------------- */}
           <div className="flex flex-col gap-4">
-            <ul className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+            <ul className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
               {lines.map((line, i) => (
                 <Reveal as="li" key={line.label} delay={i * 80}>
                   <a

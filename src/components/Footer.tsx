@@ -37,15 +37,6 @@ export default function Footer() {
             >
               <Icon name="mail" className="size-5" />
             </a>
-            <a
-              href={CONTACT.websiteHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={t.contact.websiteLabel}
-              className="grid size-11 place-items-center rounded-full border border-gold/30 text-gold transition-colors duration-300 hover:bg-gold hover:text-burgundy"
-            >
-              <Icon name="globe" className="size-5" />
-            </a>
           </div>
           {/* Social profiles: no official links supplied, so none are invented. */}
           <p className="text-[0.75rem] text-cream/35">{t.footer.socialSoon}</p>
