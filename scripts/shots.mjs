@@ -34,6 +34,8 @@ const ANCHORS = [
   "clients",
   "cta",
   "contact",
+  "location-cairo",
+  "location-new-damietta",
   "footer",
 ];
 

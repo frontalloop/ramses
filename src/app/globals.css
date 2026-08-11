@@ -152,6 +152,20 @@
     transform: none;
   }
 
+  /* Gold rule that draws itself in when scrolled into view. */
+  .line-draw {
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 1s var(--ease-brand);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  [dir="rtl"] .line-draw {
+    transform-origin: right center;
+  }
+  .line-draw.is-in {
+    transform: none;
+  }
+
   .split-line {
     display: block;
     overflow: hidden;
@@ -525,6 +539,7 @@
     animation: none;
   }
   .reveal,
+  .line-draw,
   .split-line > span {
     transition-duration: 0.001ms;
   }

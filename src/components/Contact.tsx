@@ -20,10 +20,11 @@ export default function Contact() {
       <div className="mx-auto flex max-w-[min(1240px,92vw)] flex-col gap-12">
         <SectionHead label={t.contact.label} heading={t.contact.heading} intro={t.contact.intro} />
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+        {/* Branch addresses live in their own Location sections below. */}
+        <div className="grid gap-6">
           {/* ---------------- details ---------------- */}
           <div className="flex flex-col gap-4">
-            <ul className="grid gap-3.5 sm:grid-cols-2">
+            <ul className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
               {lines.map((line, i) => (
                 <Reveal as="li" key={line.label} delay={i * 80}>
                   <a
@@ -68,53 +69,6 @@ export default function Contact() {
               </Btn>
             </div>
           </div>
-
-          {/* ---------------- offices + map placeholder ---------------- */}
-          <Reveal delay={120} className="flex flex-col gap-4">
-            {t.contact.offices.map((office, i) => (
-              <div key={office.city} className="card-shell flex items-start gap-4 rounded-[30px] rounded-ee-[56px] p-6">
-                <span className="grid size-12 shrink-0 place-items-center rounded-full border border-gold/30 bg-gold/8 text-gold">
-                  <Icon name="pin" className="size-5" />
-                </span>
-                <div className="min-w-0">
-                  <h3 className="text-[1.02rem] font-bold text-cream">{office.city}</h3>
-                  <p className="mt-1.5 text-[0.92rem] leading-relaxed text-cream/72">{office.short}</p>
-                  <p className="mt-1 text-[0.86rem] leading-relaxed text-cream/50">{office.full}</p>
-                  {/* TODO: set CONTACT.mapCairoHref / mapDamiettaHref to the real
-                      Google Maps place links, then render a "directions" button here. */}
-                  {(i === 0 ? CONTACT.mapCairoHref : CONTACT.mapDamiettaHref) && (
-                    <a
-                      href={i === 0 ? CONTACT.mapCairoHref : CONTACT.mapDamiettaHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center gap-2 rounded-full border border-gold/35 px-4 py-2 text-[0.8rem] font-bold text-gold"
-                    >
-                      {t.contact.directions}
-                    </a>
-                  )}
-                </div>
-              </div>
-            ))}
-
-            {/* Styled map placeholder — no fake location is embedded. */}
-            <div className="relative flex min-h-48 items-end overflow-hidden rounded-[30px] rounded-ss-[56px] border border-gold/20 bg-burgundy-deep p-6">
-              <svg viewBox="0 0 400 260" aria-hidden className="pointer-events-none absolute inset-0 size-full opacity-45">
-                <defs>
-                  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M40 0H0v40" fill="none" stroke="currentColor" className="text-gold/18" strokeWidth="0.6" />
-                  </pattern>
-                </defs>
-                <rect width="400" height="260" fill="url(#grid)" />
-                <path d="M0 170 Q 120 120 200 150 T 400 110" fill="none" stroke="currentColor" className="text-gold/30" strokeWidth="1.4" />
-                <path d="M150 0 Q 170 120 130 260" fill="none" stroke="currentColor" className="text-gold/20" strokeWidth="1.2" />
-              </svg>
-              <span className="absolute start-1/2 top-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-gold/15 text-gold rtl:translate-x-1/2">
-                <span className="absolute inset-0 animate-ping rounded-full bg-gold/20" />
-                <Icon name="pin" className="relative size-6" />
-              </span>
-              <p className="relative text-[0.82rem] font-semibold text-cream/60">{t.contact.mapNote}</p>
-            </div>
-          </Reveal>
         </div>
       </div>
     </section>

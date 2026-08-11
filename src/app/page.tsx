@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Loader from "@/components/Loader";
+import Locations from "@/components/Locations";
 import Operations from "@/components/Operations";
 import Quality from "@/components/Quality";
 import Services from "@/components/Services";
@@ -33,6 +34,7 @@ export default function Page() {
         <Clients />
         <FinalCta />
         <Contact />
+        <Locations />
       </main>
       <Footer />
       <WhatsAppFab />

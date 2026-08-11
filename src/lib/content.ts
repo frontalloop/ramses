@@ -31,9 +31,8 @@ export const CONTACT = {
   emailHref: "mailto:info@ramsesservice.com",
   website: "www.ramsesservice.com",
   websiteHref: "https://www.ramsesservice.com",
-  // TODO: replace with the real Google Maps place links once available.
-  mapCairoHref: "",
-  mapDamiettaHref: "",
+  mapCairoHref: "https://maps.app.goo.gl/VEeQfW7EWKZgvCsg8?g_st=iw",
+  mapDamiettaHref: "https://maps.app.goo.gl/KDU4zizD6TnMmntc6?g_st=iw",
 } as const;
 
 const ar = {
@@ -327,6 +326,29 @@ const ar = {
     mail: "راسلنا",
     directions: "عرض العنوان",
     mapNote: "خريطة تفاعلية — سيتم ربط الموقع الدقيق قريبًا.",
+  },
+
+  /** Two standalone location sections — one per branch, rendered separately. */
+  locations: {
+    mapNote: "معاينة توضيحية — اضغط الزر لفتح الموقع الدقيق على خرائط جوجل.",
+    items: [
+      {
+        label: "فرع القاهرة",
+        city: "القاهرة",
+        address: "مدينة نصر – شارع أحمد فخري، امتداد مكرم عبيد، القاهرة",
+        cta: "عرض الموقع على الخريطة",
+        aria: "فتح موقع فرع القاهرة على خرائط جوجل",
+        href: CONTACT.mapCairoHref,
+      },
+      {
+        label: "فرع دمياط الجديدة",
+        city: "دمياط الجديدة",
+        address: "المنطقة المركزية – خلف بنك القاهرة، دمياط الجديدة",
+        cta: "عرض الموقع على الخريطة",
+        aria: "فتح موقع فرع دمياط الجديدة على خرائط جوجل",
+        href: CONTACT.mapDamiettaHref,
+      },
+    ],
   },
 
   footer: {
@@ -639,6 +661,28 @@ const en: typeof ar = {
     mail: "Email us",
     directions: "View address",
     mapNote: "Interactive map — the exact location link will be added soon.",
+  },
+
+  locations: {
+    mapNote: "Illustrative preview — tap the button to open the exact location on Google Maps.",
+    items: [
+      {
+        label: "Cairo Branch",
+        city: "Cairo",
+        address: "Nasr City – Ahmed Fakhry St., Makram Ebeid Extension, Cairo",
+        cta: "View on Google Maps",
+        aria: "Open Cairo branch on Google Maps",
+        href: CONTACT.mapCairoHref,
+      },
+      {
+        label: "New Damietta Branch",
+        city: "New Damietta",
+        address: "Central Area – Behind Banque du Caire, New Damietta",
+        cta: "View on Google Maps",
+        aria: "Open New Damietta branch on Google Maps",
+        href: CONTACT.mapDamiettaHref,
+      },
+    ],
   },
 
   footer: {
