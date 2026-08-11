@@ -68,7 +68,11 @@ export default function Operations() {
             viewBox="0 0 100 1000"
             preserveAspectRatio="none"
             aria-hidden
-            className="ops-spine pointer-events-none absolute inset-y-0 start-[18px] w-14 -translate-x-1/2 rtl:translate-x-1/2 lg:start-1/2 lg:w-24"
+            /* h-full is load-bearing: an <svg> is a replaced element, so the
+               viewBox gives it an intrinsic 100:1000 ratio and the browser sizes
+               it width×10 (560px), ignoring inset-y-0. The spine then ended
+               after card 2 instead of tracking the whole list. */
+            className="ops-spine pointer-events-none absolute inset-y-0 start-[18px] h-full w-14 -translate-x-1/2 rtl:translate-x-1/2 lg:start-1/2 lg:w-24"
           >
             <path d={SPINE} fill="none" stroke="currentColor" className="text-gold/12" strokeWidth="1.4" />
             <path
