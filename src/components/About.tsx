@@ -58,12 +58,14 @@ export default function About() {
         <Reveal delay={140} className="relative">
           <div className="relative overflow-hidden rounded-[clamp(36px,6vw,72px)] rounded-ee-[clamp(80px,14vw,160px)] border border-gold/20 shadow-[0_40px_90px_-40px_rgba(0,0,0,0.95)]">
             <img
-              src="/img/about.webp"
+              src="/img/about-team.webp"
               alt={t.about.imageAlt}
-              width={880}
-              height={830}
+              width={1120}
+              height={1669}
               loading="lazy"
-              className="aspect-[880/830] w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04]"
+              /* portrait source in a near-square frame: bias the cover crop upward
+                 so the whole crew — mop, squeegee, tablet, cart — stays in view */
+              className="aspect-[880/830] w-full object-cover object-[center_45%] transition-transform duration-[1200ms] ease-[cubic-bezier(0.22,1,0.36,1)] hover:scale-[1.04]"
             />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-burgundy-deep/70 via-transparent to-transparent" />
           </div>
