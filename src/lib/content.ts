@@ -320,7 +320,7 @@ const ar = {
     phoneLabel: "هاتف",
     mobileLabel: "موبايل / واتساب",
     emailLabel: "البريد الإلكتروني",
-    websiteLabel: "الموقع الإلكتروني",
+    websiteLabel: "الموقع الإلكتروني",  
     call: "اتصل بنا",
     whatsapp: "واتساب",
     mail: "راسلنا",
