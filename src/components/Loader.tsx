@@ -118,6 +118,13 @@ export default function Loader() {
         delete document.body.dataset.locked;
         ScrollTrigger.refresh();
         window.dispatchEvent(new Event("ramses:loaded"));
+        // Webfonts swapping in changes every section's height, which moves every
+        // trigger's start/end. They normally land well inside the 3s above, but
+        // on a slow first visit they can arrive after it — so re-measure once
+        // more when they settle. `.then` on an already-resolved promise is a
+        // no-op refresh, and this is the only other refresh on the page: the
+        // whole site measures here and nowhere else.
+        document.fonts?.ready.then(() => ScrollTrigger.refresh());
       },
       Math.max(0, TOTAL - performance.now()),
     );

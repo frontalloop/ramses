@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import manifest from "../../public/seq/manifest.json";
+import { fitFrame } from "@/lib/heroFit";
 import { useLang } from "@/lib/lang";
 import { Btn, useAfterLoad } from "./ui";
 
@@ -105,9 +106,12 @@ export default function Hero() {
       // Re-assert every time: resizing the backing store resets the context,
       // and a DPR change alone (moving between displays) needs it too.
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const drawn = current;
+      // Repaint the frame the scroll position is asking for, not whichever
+      // neighbour happened to be standing in for it. Keeping `wanted` means an
+      // exact frame arriving later still lands, and an ordinary resize never
+      // rewinds the sequence to frame 1 — it holds the current scroll progress.
       current = -1;
-      draw(drawn < 0 ? 0 : drawn);
+      draw(wanted);
     };
 
     /* ---------------- drawing ---------------------------------------- */
@@ -122,30 +126,27 @@ export default function Hero() {
 
     const draw = (index: number) => {
       wanted = Math.min(n - 1, Math.max(0, index));
+      const cw = canvas.clientWidth;
+      const ch = canvas.clientHeight;
       const i = nearestReady(wanted);
-      if (i < 0 || i === current) return;
+
+      if (i < 0) {
+        // Nothing decoded yet. Resizing the backing store just blanked it, and
+        // an alpha:false context blanks to black, so lay the flat burgundy down
+        // rather than flashing a black rectangle behind the hero copy.
+        ctx.fillStyle = LETTERBOX;
+        ctx.fillRect(0, 0, cw, ch);
+        return;
+      }
+      if (i === current) return;
       const img = images[i];
       if (!img) return;
       current = i;
 
-      // Contain: the whole frame, every edge, on every aspect ratio. Any
-      // space left over is letterboxed in flat burgundy — the frame is never
-      // zoomed to fill it.
-      const cw = canvas.clientWidth;
-      const ch = canvas.clientHeight;
-      const scale = Math.min(cw / img.naturalWidth, ch / img.naturalHeight);
-      const dw = img.naturalWidth * scale;
-      const dh = img.naturalHeight * scale;
-      const dx = (cw - dw) / 2;
-
-      // Vertically centred, except on portrait screens: there the 16:9 band
-      // is short and the hero copy below it is taller than the space a
-      // dead-centre band would leave, so reserve the lower area for the text
-      // and centre the frame in what remains. The frame is never scaled or
-      // cropped for this — only seated higher.
-      const slack = ch - dh;
-      const reserve = slack > dh * 0.9 ? Math.min(slack, ch * 0.46) : 0;
-      const dy = (slack - reserve) / 2;
+      // Geometry lives in one place (see lib/heroFit) so the first frame, the
+      // scrubbed sequence and the reduced-motion still frame are all seated
+      // identically and can never disagree.
+      const { dx, dy, dw, dh } = fitFrame(img.naturalWidth, img.naturalHeight, cw, ch);
 
       ctx.clearRect(0, 0, cw, ch);
       ctx.fillStyle = LETTERBOX;
@@ -181,9 +182,29 @@ export default function Hero() {
     };
     for (let k = 0; k < 6; k++) pump();
 
+    // The canvas is inset-0 inside the sticky 100svh box, so every viewport
+    // change — window resize, F11 in and out, zoom, orientation, mobile URL bar
+    // — reaches it as an element resize. One observer covers all of them.
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
+
+    // Except a DPR change on its own: dragging the window to a display with a
+    // different pixel density leaves the CSS size identical, so the observer
+    // never fires and the backing store would stay at the old density. A
+    // resolution query re-arms itself at each new DPR.
+    let dprQuery: MediaQueryList | null = null;
+    const onDpr = () => {
+      watchDpr();
+      resize();
+    };
+    function watchDpr() {
+      dprQuery?.removeEventListener("change", onDpr);
+      dprQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+      dprQuery.addEventListener("change", onDpr);
+    }
+    watchDpr();
+    const unwatchDpr = () => dprQuery?.removeEventListener("change", onDpr);
 
     /* ---------------- scroll → frame --------------------------------- */
     let tween: gsap.core.Tween | null = null;
@@ -199,6 +220,7 @@ export default function Hero() {
       return () => {
         disposed = true;
         ro.disconnect();
+        unwatchDpr();
         window.clearInterval(iv);
       };
     }
@@ -226,6 +248,7 @@ export default function Hero() {
     return () => {
       disposed = true;
       ro.disconnect();
+      unwatchDpr();
       window.removeEventListener("orientationchange", onOrient);
       tween?.scrollTrigger?.kill();
       tween?.kill();

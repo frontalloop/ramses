@@ -8,6 +8,7 @@
     "start": "node scripts/serve-out.mjs",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "check:hero": "node --experimental-strip-types scripts/check-hero-fit.mjs",
     "frames": "python scripts/build-frames.py"
   },
   "dependencies": {
