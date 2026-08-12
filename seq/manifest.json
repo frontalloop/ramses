@@ -1,0 +1,16 @@
+{
+  "count": 240,
+  "pattern": "/seq/{variant}/f{index}.webp",
+  "pad": 3,
+  "aspect": 1.777778,
+  "variants": {
+    "desktop": {
+      "width": 1280,
+      "height": 720
+    },
+    "mobile": {
+      "width": 720,
+      "height": 404
+    }
+  }
+}
